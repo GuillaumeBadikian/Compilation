@@ -65,3 +65,60 @@ temp312 pression42 vol18 temp346 temp18
 ....................................
 07/09/2018 17:05/30 40 528 155 20 5 
 
+fichier: pl liste-lignes
+pl: IDF pl
+   | IDF
+   ;
+   
+%{
+int nbidf = 0;
+int nbvals = 0;
+int nblignes = 0
+int tabval[5000][100];
+
+%}
+
+%token DATE HEURE
+% token ENT IDF
+%%
+fichier : premiere_ligne lignes_suivantes
+premiere_ligne:IDF {nbidf++;}
+              | IDF premiere_ligne {nbidf++;}
+              ;
+lignes_suivantes : une_ligne {numligne++;}
+                 | une_ligne lignes_suivantes {numligne++;}
+                 ;
+une_ligne: DATE HEURE liste_valeurs {(if nbidf>nbvals){printf("....");}}
+    ;
+liste_valeurs:  ENT {tabval[numligne][nbvals]=$1; nbvals++;}
+             | ENT liste_valeurs {tabval[numligne][nbvals]=$1; nbvals++;}
+             ;
+
+
+
+%{
+    #include "y.tab.h"
+    int numero_ligne = 0;
+
+%}
+Jour (01|02|...|31)
+mois (01|...|12)
+annee (18|...|22)
+heure (00|01|...|24)
+minute(00|01|...|59)
+seconde(00|01|...|59)
+%%
+{jour}\/{mois}\/{annee} {return (DATE);}
+{heure}\:{minute}\:{seconde} {return (HEURE);}
+[1-9][0-9]*|0 {return(ENT);}
+[a-zA-Z][a-zA-Z0-9]* {return (IDF);}
+\n {numero_ligne++;}
+[ \t] {return (ERR);}
+
+
+
+
+
+
+
+

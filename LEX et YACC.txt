@@ -1,0 +1,67 @@
+Non terminal = IDF commençant par une lettre minuscule
+Terminal = IDF commençant par une lettre majuscule
+/*exemple */
+%%
+x: Y42 ztu V;
+ztu: A w b
+   |A
+   |
+   ;
+w:
+   |x k
+   ;
+k:;
+%%
+/* fin exemple */
+
+/* exo 3.1 */
+/*lex*/
+%%
+"%%" {return(PP);}
+: {return(DP);}
+";" {return(PV);}
+"|" {return(BARRE);}
+[a-z][a-zA-Z0-9]* {return (NONTERMINAL);}
+[A-Z][a-zA-Z0-9]* {return (TERM);}
+%%
+
+
+/*yacc*/
+%token NONTERMINAL TERM
+%token PP DP PV BARRE
+%%
+pgyacc : PP liste_regles PP
+liste_regles : une_regle PV liste_regles
+             | /*rien*/
+             ;
+une_regle : NONTERMINAL DP liste_alternatives
+            ;
+liste_alternatives : une_alternative BARRE liste_alternatives
+                    | une_alternative
+                    ;
+une_alternative : symbole une_alternative
+                |
+                ;
+symbole:TERM
+        |NONTERMINAL
+        ;
+%%
+
+int yyerror() /*redefinition de la fonction yyerror
+{
+    printf("Erreur de syntaxe en ligne %d\n", nblignes);
+}
+
+
+
+/*exo 3.2 */
+
+temp312 pression42 vol18 temp346 temp18
+
+07/09/2018 16:18:00 38 425 150 20 15
+07/09/2018 16:18:15 38 426 152 18 14
+07/09/2018 16:18:15 37 429 151 19 15
+....................................
+....................................
+07/09/2018 17:05/30 40 528 155 20 5 
+
